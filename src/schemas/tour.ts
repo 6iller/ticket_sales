@@ -11,7 +11,7 @@ export class Tour implements ITour {
     @Prop() tourOperator: string;
     @Prop() price: string;
     @Prop() img: string;
-    @Prop() id: string; // Аналогично id в UserSchema
+    @Prop() id: string;
     @Prop() type: string;
     @Prop() date: string;
 }

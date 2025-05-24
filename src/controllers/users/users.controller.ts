@@ -1,8 +1,10 @@
-import {Body, Controller, Delete, Get, Param, Post, Put, Query} from '@nestjs/common';
+import {Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards} from '@nestjs/common';
 import {UsersService} from "../../services/users/users.service";
 import {User} from "../../schemas/user";
 import {UserDto} from "../../dto/user-dto";
 import RejectedValue = jest.RejectedValue;
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from 'src/services/authentification/jwt-auth.guard/jwt-auth.guard.service';
  
 @Controller('users')
 export class UsersController {
@@ -19,7 +21,7 @@ export class UsersController {
     getUserById(@Param('id') id): Promise<User> {
         return this.userService.getUserById(id);
     }
- 
+    // @UseGuards (JwtAuthGuard)
     @Post()
     sendUser(@Body() data: UserDto): Promise<User> {
  
@@ -35,18 +37,22 @@ export class UsersController {
  
     }
  
+    @UseGuards (AuthGuard('local'))
     @Post(":login")
-    authUser(@Body() data: UserDto, @Param('login') login): Promise<User | boolean>  {
-        return this.userService.checkAuthUser(data.login, data.password).then((queryRes) => {
-            if (queryRes.length !== 0) {
-                return Promise.resolve(true);
-            } else {
-                console.log('err - user is exists')
-                return Promise.reject();
-            }
-        });
- 
+    authUser(@Body() data: UserDto, @Param('login') login): 
+    // Promise<User | boolean>  {
+    //     return this.userService.checkAuthUser(data.login, data.password).then((queryRes) => {
+    //         if (queryRes.length !== 0) {
+    //             return Promise.resolve(true);
+    //         } else {
+    //             console.log('err - user exists')
+    //             return Promise.reject();
+    //         }
+    //     });
+    any{
+        return this.userService.login(data);
     }
+
  
     @Put(":id")
     updateUsers(@Param('id') id, @Body() data) : Promise<User> {
@@ -65,49 +71,3 @@ export class UsersController {
     }
  
 }
-
-
-// import { Controller, Get, Post, Put, Delete, Param, Query, Body } from '@nestjs/common';
-// import { User } from 'src/schemas/user';
-// import { UsersService } from 'src/services/users/users.service';
-
-// @Controller('users')
-// export class UsersController {
-
-//   constructor (private usersService: UsersService) {}
-
-
-//  @Get()
-//   getUser(): Promise<User[]> {
-//     return this.usersService.getUser()
-//   }
-
-//   @Get(":id")
-//   getUserById(@Param('id') id): Promise<User| null> {
-//     return this.usersService.getUserById(id);
-//   }
-
-//   @Post ()
-//   sendUser(@Body() data): Promise<User> {
-//     return this.usersService.sendUser(data);
-//   }
-//   @Put ("id")
-//   updateUser(@Param('id') id, @Body() data): Promise<User| null> {
-//     return this.usersService.updateUser(id, data);
-//   }
-//   @Delete ()
-//   deleteUser(): Promise<User | null> {
-//     return this.usersService.deleteUser();
-    
-//   }
-
-//   @Delete (":id")
-//   deleteUserById(@Param('id') id): Promise<User| null> {
-//     return this.usersService.deleteUserById(id);
-    
-//   }
-
-
-//   }
-
-
